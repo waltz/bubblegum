@@ -1,0 +1,5 @@
+1. A peer pings a well-known server and retrieves a list of the ten most recent hosts
+that have done the same retrieval.
+2. Using any one of the known hosts, the peer adds itself to the hash table.
+3. Once the peer can talk to other peers, it asks the community where a user is. (This is done
+by )
