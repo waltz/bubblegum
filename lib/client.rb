@@ -4,11 +4,12 @@ require 'xmlrpc/client'
 class Client
   
   def initialize
+    @running = true
     get_input
   end
   
   def get_input
-    while 1
+    while @running
       printf "bubblegum: "
       input = gets
       exec(input.chomp)
@@ -23,6 +24,10 @@ class Client
     
     # Process the command.
     case command.first
+      when "ping":
+        ping
+      when "link":
+        link(rest)
       when "help":
         help(rest)
       when "about":
@@ -49,7 +54,29 @@ class Client
   
   def quit(rest = nil)
     puts "Later dude!"
-    exit
+    @running = false
+  end
+  
+  # Links this client instance with some bubblegum daemon
+  def link(rest = nil)
+    host = rest[0]
+    port = rest[1]
+    
+    begin
+      @daemon = XMLRPC::Client.new(host, nil, port, nil, nil, nil, nil, true, nil)
+    rescue Exception => e
+      puts "There was an error trying to connect to the daemon."
+      puts e.inspect
+    end
+  end
+  
+  # Pings the server.
+  def ping(rest = nil)
+    if @daemon
+      puts @daemon.call("bubblegum.ping")
+    else
+      puts "Not connected. Try \"link\" first."
+    end
   end
   
 end

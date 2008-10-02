@@ -1,20 +1,20 @@
 require 'webrick'
 require 'webrick/https'
 require 'xmlrpc/server'
-require 'preferences'
+require File.dirname(__FILE__) + '/./preferences'
 
 # Small https server that is the main control interface for the Bubblegum peer.
 class Server
   
   def initialize
-    @prefs = Preferences.new
+    @prefs = Preferences.instance
     start_server
   end
   
   def start_server
     # Build the WEBrick server.
     @webrick = WEBrick::HTTPServer.new(
-      :Port => 2000,
+      :Port => @prefs.port,
       :Documentroot => nil,
       :SSLEnable => true,
       :SSLVerifyClient => ::OpenSSL::SSL::VERIFY_NONE,
@@ -38,8 +38,8 @@ class Server
   def build_xmlrpc
     xmlrpc = XMLRPC::WEBrickServlet.new
     
-    xmlrpc.add_handler("bubblegum.add") do |a,b|
-      a + b
+    xmlrpc.add_handler("bubblegum.ping") do
+      "Pong!"
     end
     
     xmlrpc
